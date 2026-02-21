@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 
-const ANTHROPIC_API_URL = "https://api.anthropic.com/v1/messages";
-const MODEL = "claude-haiku-4-5-20251001";
+const GEMINI_API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent";
 
 const SYSTEM_PROMPT = `You are a warm, compassionate Bible guide. The user will describe how they are feeling. Your job is to select a single Bible verse or short passage (no more than 5 verses) that speaks directly to their emotional state, and write a brief, comforting reflection.
 
@@ -30,9 +29,9 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  const apiKey = process.env.ANTHROPIC_API_KEY;
+  const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) {
-    console.error("ANTHROPIC_API_KEY is not set");
+    console.error("GEMINI_API_KEY is not set");
     return NextResponse.json(
       { error: "Server configuration error." },
       { status: 500 }
@@ -40,35 +39,50 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    const anthropicResponse = await fetch(ANTHROPIC_API_URL, {
+    const geminiResponse = await fetch(`${GEMINI_API_URL}?key=${apiKey}`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "x-api-key": apiKey,
-        "anthropic-version": "2023-06-01",
       },
       body: JSON.stringify({
-        model: MODEL,
-        max_tokens: 300,
-        system: SYSTEM_PROMPT,
-        messages: [{ role: "user", content: mood }],
+        system_instruction: {
+          parts: [{ text: SYSTEM_PROMPT }],
+        },
+        contents: [
+          {
+            role: "user",
+            parts: [{ text: mood }],
+          },
+        ],
+        generationConfig: {
+          maxOutputTokens: 300,
+          temperature: 0.7,
+        },
       }),
     });
 
-    if (!anthropicResponse.ok) {
-      console.error("Anthropic API error:", anthropicResponse.status);
+    if (!geminiResponse.ok) {
+      const errorData = await geminiResponse.text();
+      console.error("Gemini API error:", geminiResponse.status, errorData);
       return NextResponse.json(
         { error: "Failed to get a response. Please try again." },
         { status: 502 }
       );
     }
 
-    const data = await anthropicResponse.json();
-    const text = data.content[0].text;
+    const data = await geminiResponse.json();
+    const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
 
-    const parsed = JSON.parse(text);
+    if (!text) {
+      throw new Error("No text in Gemini response");
+    }
+
+    // Strip markdown code fences if present
+    const cleanText = text.replace(/```json\s*/g, "").replace(/```\s*/g, "").trim();
+
+    const parsed = JSON.parse(cleanText);
     if (!parsed.reference || !parsed.verseRange || !parsed.reflection) {
-      throw new Error("Missing fields in Claude response");
+      throw new Error("Missing fields in Gemini response");
     }
 
     return NextResponse.json(parsed);
