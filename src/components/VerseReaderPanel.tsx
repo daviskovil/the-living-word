@@ -8,9 +8,25 @@ interface VerseReaderPanelProps {
   reflection: string | null;
   loading: boolean;
   error: string | null;
+  onReadFullChapter?: (chapterReference: string) => void;
 }
 
-export function VerseReaderPanel({ passage, reflection, loading, error }: VerseReaderPanelProps) {
+/**
+ * Extract the chapter reference from a passage reference.
+ * e.g. "Philippians 4:13" -> "Philippians 4"
+ *      "Romans 8:28-30" -> "Romans 8"
+ *      "Philippians 4" -> null (already a full chapter)
+ */
+function getChapterReference(passage: BiblePassage): string | null {
+  // If the reference contains a colon, it's a specific verse/range — we can offer the full chapter
+  if (passage.reference.includes(":")) {
+    const match = passage.reference.match(/^(.+?\s+\d+):/);
+    if (match) return match[1];
+  }
+  return null;
+}
+
+export function VerseReaderPanel({ passage, reflection, loading, error, onReadFullChapter }: VerseReaderPanelProps) {
   if (!loading && !passage && !error) return null;
 
   // Group verses by chapter to insert chapter headings for multi-chapter passages
@@ -61,6 +77,8 @@ export function VerseReaderPanel({ passage, reflection, loading, error }: VerseR
     ));
   }
 
+  const chapterRef = passage ? getChapterReference(passage) : null;
+
   return (
     <section className="mt-10 animate-fade-in">
       <div className="bg-white/60 border border-parchment-200 rounded-xl p-6 sm:p-8 max-h-[70vh] overflow-y-auto">
@@ -90,6 +108,18 @@ export function VerseReaderPanel({ passage, reflection, loading, error }: VerseR
               <blockquote className="reflection">
                 {reflection}
               </blockquote>
+            )}
+
+            {chapterRef && onReadFullChapter && (
+              <button
+                onClick={() => onReadFullChapter(chapterRef)}
+                className="mt-4 inline-flex items-center gap-2 px-4 py-2 text-sm font-sans font-medium text-parchment-700 bg-parchment-100 border border-parchment-200 rounded-lg transition-colors hover:bg-parchment-200 cursor-pointer"
+              >
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                </svg>
+                Read full chapter ({chapterRef})
+              </button>
             )}
 
             <ShareButtons reference={passage.reference} text={passage.text} />

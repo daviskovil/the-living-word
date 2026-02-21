@@ -46,6 +46,10 @@ export default function Home() {
             reflection={reflection}
             loading={loading}
             error={error}
+            onReadFullChapter={(chapterRef) => {
+              loadVerse(chapterRef);
+              scrollToReader();
+            }}
           />
         </div>
         <Footer />
