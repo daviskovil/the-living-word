@@ -183,6 +183,8 @@ export default function Home() {
             onOpenInReader={handleVerseOfDayClick}
           />
 
+          <MoodInput onMoodResult={handleMoodResult} />
+
           <HolyDayStrip upcomingDays={upcomingHolyDays} />
 
           {massReadings.readings.length > 0 && (
@@ -209,8 +211,6 @@ export default function Home() {
               />
             </details>
           </section>
-
-          <MoodInput onMoodResult={handleMoodResult} />
 
           <SaintOfTheDay
             saint={saintOfTheDay}
