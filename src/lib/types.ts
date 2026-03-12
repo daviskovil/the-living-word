@@ -25,4 +25,29 @@ export interface MoodResult {
   reference: string;
   verseRange: string;
   reflection: string;
+  saintConnection?: string;
+}
+
+// Metadata for the verse reader to know what it's displaying
+export type VerseSource = "mass-reading" | "mood" | "verse-of-day" | "yearly-plan" | "saint";
+
+export interface VerseContext {
+  source: VerseSource;
+  liturgicalLabel?: string; // "First Reading", "Gospel", etc.
+  saintConnection?: string;
+}
+
+// Journal entry
+export interface JournalEntry {
+  date: string; // ISO date string "2026-02-21"
+  reference: string;
+  text: string;
+  timestamp: number; // Unix ms for sorting
+}
+
+// Reading streak
+export interface StreakData {
+  currentStreak: number;
+  lastReadDate: string; // ISO date "2026-02-21"
+  longestStreak: number;
 }

@@ -1,10 +1,10 @@
 import type { Metadata } from "next";
-import { Libre_Baskerville, Inter } from "next/font/google";
+import { EB_Garamond, Inter } from "next/font/google";
 import "./globals.css";
 
-const libreBaskerville = Libre_Baskerville({
+const ebGaramond = EB_Garamond({
   subsets: ["latin"],
-  weight: ["400", "700"],
+  weight: ["400", "500", "600", "700", "800"],
   style: ["normal", "italic"],
   variable: "--font-serif",
   display: "swap",
@@ -18,7 +18,8 @@ const inter = Inter({
 
 export const metadata: Metadata = {
   title: "The Living Word",
-  description: "Your daily Bible companion — readings and reflections for every day.",
+  description:
+    "Catholic Bible companion — daily Mass readings, liturgical calendar, saints, and reflections.",
 };
 
 export default function RootLayout({
@@ -29,7 +30,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${libreBaskerville.variable} ${inter.variable} antialiased`}
+        className={`${ebGaramond.variable} ${inter.variable} antialiased`}
       >
         {children}
       </body>

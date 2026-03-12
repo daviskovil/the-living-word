@@ -1,66 +1,127 @@
 @import "tailwindcss";
 
 @theme inline {
-  --color-parchment-50: #fefdfb;
-  --color-parchment-100: #fdf8f0;
-  --color-parchment-200: #f5ead6;
-  --color-parchment-300: #e8d5b5;
-  --color-parchment-400: #d4b896;
-  --color-parchment-500: #b8956a;
-  --color-parchment-600: #96744d;
-  --color-parchment-700: #6b5137;
-  --color-parchment-800: #4a3726;
-  --color-parchment-900: #2d2118;
+  /* Modern neutral palette */
+  --color-surface-50: #fafafa;
+  --color-surface-100: #f4f4f5;
+  --color-surface-200: #e4e4e7;
+  --color-surface-300: #d4d4d8;
+  --color-surface-400: #a1a1aa;
+  --color-surface-500: #71717a;
+  --color-surface-600: #52525b;
+  --color-surface-700: #3f3f46;
+  --color-surface-800: #27272a;
+  --color-surface-900: #18181b;
+
+  /* Primary accent — deep spiritual indigo */
+  --color-primary-50: #eef2ff;
+  --color-primary-100: #e0e7ff;
+  --color-primary-200: #c7d2fe;
+  --color-primary-300: #a5b4fc;
+  --color-primary-400: #818cf8;
+  --color-primary-500: #6366f1;
+  --color-primary-600: #4f46e5;
+  --color-primary-700: #4338ca;
+
+  /* Warm accent — gold */
+  --color-accent-400: #fbbf24;
+  --color-accent-500: #f59e0b;
+  --color-accent-600: #d97706;
+
+  /* Liturgical season colors */
+  --color-lit-purple: #7c3aed;
+  --color-lit-green: #059669;
+  --color-lit-red: #dc2626;
+  --color-lit-rose: #ec4899;
 
   --font-serif: var(--font-serif), Georgia, serif;
   --font-sans: var(--font-sans), system-ui, sans-serif;
 
-  --animate-fade-in: fadeIn 0.4s ease-out;
+  --animate-fade-in: fadeIn 0.35s ease-out;
+  --animate-pulse-gentle: pulseGentle 2s ease-in-out infinite;
+  --animate-slide-up: slideUp 0.4s ease-out;
 }
 
 @keyframes fadeIn {
-  0% {
-    opacity: 0;
-    transform: translateY(8px);
-  }
-  100% {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  0% { opacity: 0; transform: translateY(6px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes pulseGentle {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+}
+
+@keyframes slideUp {
+  0% { opacity: 0; transform: translateY(16px); }
+  100% { opacity: 1; transform: translateY(0); }
 }
 
 body {
-  background-color: var(--color-parchment-50);
-  color: var(--color-parchment-800);
+  background-color: var(--color-surface-50);
+  color: var(--color-surface-800);
   font-family: var(--font-sans);
-  /* Subtle paper grain texture */
-  background-image: url("/noise.svg");
 }
 
-/* Verse text */
+/* Scripture text — only place serif is used */
 .verse-text {
   font-family: var(--font-serif);
   font-size: 1.125rem;
-  line-height: 1.85;
-  color: var(--color-parchment-900);
+  line-height: 1.9;
+  color: var(--color-surface-900);
 }
 
 .verse-number {
   font-family: var(--font-sans);
-  font-size: 0.7rem;
-  color: var(--color-parchment-400);
+  font-size: 0.65rem;
+  color: var(--color-primary-500);
   vertical-align: super;
   margin-right: 2px;
-  font-weight: 500;
+  font-weight: 700;
 }
 
-/* Reflection block */
 .reflection {
   font-family: var(--font-serif);
   font-style: italic;
-  color: var(--color-parchment-700);
-  border-left: 2px solid var(--color-parchment-300);
+  color: var(--color-surface-600);
+  border-left: 3px solid var(--color-primary-200);
   padding-left: 1rem;
   margin-top: 1.5rem;
   line-height: 1.75;
+}
+
+.saint-connection {
+  font-family: var(--font-serif);
+  font-style: italic;
+  color: var(--color-accent-600);
+  border-left: 3px solid var(--color-accent-400);
+  padding-left: 1rem;
+  margin-top: 1rem;
+  line-height: 1.75;
+  font-size: 0.95rem;
+}
+
+.section-label {
+  font-family: var(--font-sans);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--color-surface-500);
+}
+
+.liturgical-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-family: var(--font-sans);
+  font-size: 0.6875rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--color-primary-700);
+  background-color: var(--color-primary-50);
+  padding: 0.25rem 0.625rem;
+  border-radius: 9999px;
+  margin-bottom: 0.75rem;
 }

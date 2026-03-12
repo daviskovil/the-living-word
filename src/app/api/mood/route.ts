@@ -2,20 +2,23 @@ import { NextRequest, NextResponse } from "next/server";
 
 const GEMINI_API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent";
 
-const SYSTEM_PROMPT = `You are a warm, compassionate Bible guide. The user will describe how they are feeling. Your job is to select a single Bible verse or short passage (no more than 5 verses) that speaks directly to their emotional state, and write a brief, comforting reflection.
+const SYSTEM_PROMPT = `You are a warm, compassionate Catholic spiritual director. The user will describe how they are feeling. Your job is to select a single Bible verse or short passage (no more than 5 verses) that speaks directly to their emotional state, write a brief comforting reflection rooted in Catholic teaching, and suggest a connection to a saint who experienced similar feelings.
 
 Respond ONLY with valid JSON in this exact format, no markdown, no extra text:
 {
   "reference": "Book Chapter:Verse",
   "verseRange": "Book Chapter:Verse-Verse",
-  "reflection": "A 2-3 sentence warm, pastoral reflection connecting the verse to their feelings."
+  "reflection": "A 2-3 sentence warm, pastoral reflection connecting the verse to their feelings, drawing on Catholic spiritual tradition.",
+  "saintConnection": "A 1-2 sentence connection to a relevant saint. E.g., 'St. Therese of Lisieux called these moments her little way...'"
 }
 
 Rules:
 - "reference" is the human-readable citation (e.g., "Isaiah 41:10")
 - "verseRange" is the exact range to fetch from an API (e.g., "Isaiah 41:10" for a single verse, or "Romans 8:28-30" for a range). Use the full book name, not abbreviations.
 - Keep the passage short: 1-5 verses maximum.
-- The reflection should be warm, personal, and grounded in the verse's meaning. Avoid generic platitudes.
+- The reflection should draw on Catholic spiritual tradition (sacraments, saints, Church teaching).
+- The saintConnection should name a specific saint and briefly explain the relevance.
+- Only use Bible books from the Protestant canon (no Tobit, Wisdom, Sirach, Baruch, Judith, 1/2 Maccabees) as the API only supports those.
 - Do not include any text outside the JSON object.`;
 
 export async function POST(request: NextRequest) {
@@ -55,7 +58,7 @@ export async function POST(request: NextRequest) {
           },
         ],
         generationConfig: {
-          maxOutputTokens: 300,
+          maxOutputTokens: 400,
           temperature: 0.7,
         },
       }),
@@ -85,7 +88,13 @@ export async function POST(request: NextRequest) {
       throw new Error("Missing fields in Gemini response");
     }
 
-    return NextResponse.json(parsed);
+    // saintConnection is optional — don't fail if missing
+    return NextResponse.json({
+      reference: parsed.reference,
+      verseRange: parsed.verseRange,
+      reflection: parsed.reflection,
+      saintConnection: parsed.saintConnection || null,
+    });
   } catch (err) {
     console.error("Mood API error:", err);
     return NextResponse.json(
